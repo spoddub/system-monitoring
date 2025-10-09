@@ -5,10 +5,17 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "celery>=5.5.3",
     "django>=5.2.7",
     "docker>=7.1.0",
     "dotenv>=0.9.9",
+    "httpx>=0.28.1",
     "mysqlclient==2.2.7",
     "pytest>=8.4.2",
+    "python-dotenv>=1.1.1",
+    "redis>=6.4.0",
     "ruff>=0.14.0",
 ]
+
+[tool.uv]
+dev-dependencies = []
