@@ -1,0 +1,9 @@
+line-length = 80
+
+extend-exclude = [
+  "system_monitoring/settings.py",
+]
+
+[lint]
+preview = true
+select = ["E", "F", "I", "C90"]
