@@ -25,7 +25,7 @@ class MetricsSample(models.Model):
     machine = models.ForeignKey(Machine, on_delete=models.CASCADE)
 
     collected_at = models.DateTimeField()
-    timeslot_star = models.DateTimeField()  # начало 15 минут
+    timeslot_start = models.DateTimeField()  # начало 15 минут
 
     cpu_pct = models.PositiveIntegerField(null=True, blank=True)
     mem_pct = models.PositiveIntegerField(null=True, blank=True)
