@@ -1,5 +1,4 @@
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
 from .auth_utils import COOKIE_NAME, make_session_token
@@ -46,6 +45,4 @@ def logout_view(request):
 @require_http_methods(["GET"])
 def incidents_page(request):
     # по умолчанию только активные
-    return render(
-        request, "incidents.html", {"defaultActive": "true"}
-    )
+    return render(request, "incidents.html", {"defaultActive": "true"})
