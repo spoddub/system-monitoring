@@ -2,6 +2,7 @@ import random
 
 import httpx
 from celery import shared_task
+from django.conf import settings
 from django.utils import timezone
 
 from .metrics_parsers import parse_percent, parse_uptime
@@ -22,7 +23,12 @@ def collect_metrics(machine_id):
     if not machine:
         return "Machine not found"
 
-    timeout = httpx.Timeout(connect=3.0, read=8.0)
+    timeout = httpx.Timeout(
+        connect=settings.REQUEST_CONNECT_TIMEOUT,
+        read=settings.REQUEST_READ_TIMEOUT,
+        write=settings.REQUEST_READ_TIMEOUT,
+        pool=settings.REQUEST_CONNECT_TIMEOUT,
+    )
     with httpx.Client(timeout=timeout) as client:
         response = client.get(machine.url)
     response.raise_for_status()  # проверяем код ответа, если 400-599 ошибка
