@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Machine, MetricsSample, Incident
+from .models import Incident, Machine, MetricsSample
 
 
 @admin.register(Machine)
