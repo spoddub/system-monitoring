@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'system_monitoring',
 ]
 
 MIDDLEWARE = [
@@ -71,7 +72,24 @@ DATABASES = {
     }
 }
 
-
+# celery settings
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", CELERY_BROKER_URL)
+CELERY_TIMEZONE = "UTC"
+CELERY_ENABLE_UTC = True
+CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_SOFT_TIME_LIMIT = 20
+CELERY_TASK_TIME_LIMIT = 30
+# расписание каждые 15 мин
+CELERY_BEAT_SCHEDULE = {
+    "schedule-collecting-every-15m": {
+        "task": "system_monitoring.tasks.schedule_collecting",
+        "schedule": 15 * 60,
+    }
+}
+REQUEST_CONNECT_TIMEOUT = float(os.getenv("REQUEST_CONNECT_TIMEOUT", "3.0"))
+REQUEST_READ_TIMEOUT = float(os.getenv("REQUEST_READ_TIMEOUT", "8.0"))
+RETRY_LIMIT = int(os.getenv("RETRY_LIMIT", "3"))
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
