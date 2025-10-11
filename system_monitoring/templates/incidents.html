@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Incidents — System Monitoring</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <script>
+    window.DEFAULT_ACTIVE = "{{ defaultActive|default:'true' }}";
+  </script>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'incidents.css' %}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">System Monitoring — Incidents</div>
+    <nav class="actions">
+      <label class="filter">
+        <input type="checkbox" id="only-active" checked>
+        <span>Only active</span>
+      </label>
+      <a class="btn" href="/ui/logout">Logout</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <table class="tbl" id="grid">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Machine</th>
+          <th>Type</th>
+          <th>Active</th>
+          <th>Started</th>
+          <th>Resolved</th>
+          <th>Last slot</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </main>
+
+  <script src="{% static 'incidents.js' %}"></script>
+</body>
+</html>
