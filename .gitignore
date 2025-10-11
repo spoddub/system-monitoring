@@ -4,3 +4,4 @@
 system_monitoring/__pycache__
 celerybeat-schedule
 system_monitoring/tests/__pycache__
+celerybeat-schedule
