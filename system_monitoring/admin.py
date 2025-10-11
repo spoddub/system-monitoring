@@ -11,7 +11,7 @@ class MachineAdmin(admin.ModelAdmin):
 
 
 @admin.register(MetricsSample)
-class MetricsSampleAdmin:
+class MetricsSampleAdmin(admin.ModelAdmin):
     list_display = (
         "machine",
         "collected_at",
