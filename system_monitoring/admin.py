@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Machine, MetricsSample
+from .models import Machine, MetricsSample, Incident
 
 
 @admin.register(Machine)
@@ -23,3 +23,19 @@ class MetricsSampleAdmin(admin.ModelAdmin):
     )
     list_filter = ("machine",)
     search_fields = ("machine__name",)
+
+
+@admin.register(Incident)
+class IncidentAdmin(admin.ModelAdmin):
+    list_display = (
+        "machine",
+        "type",
+        "active",
+        "started_at",
+        "resolved_at",
+        "first_timeslot",
+        "last_timeslot",
+        "details",
+    )
+    list_filter = ("type", "active", "machine")
+    search_fields = ("machine__name", "details")
