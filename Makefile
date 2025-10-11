@@ -17,4 +17,5 @@ server:
 	uv run python manage.py runserver 0.0.0.0:8000
 celery:
 	uv run celery -A system_monitoring worker -l info
-
+get:
+	curl http://127.0.0.1:9001/
