@@ -5,8 +5,8 @@ from .models import Machine, MetricsSample
 
 @admin.register(Machine)
 class MachineAdmin(admin.ModelAdmin):
-    list_display = ("name", "url", "is_active", "jitter_sec", "updated_at")
-    list_filter = ("is_active",)
+    list_display = ("name", "url", "jitter_sec", "updated_at")
+    list_filter = ()
     search_fields = ("name", "url")
 
 
