@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Incident, Machine, MetricsSample
+from .models import Incident, Machine, MetricsSample, MonitorUser
 
 
 @admin.register(Machine)
@@ -39,3 +39,9 @@ class IncidentAdmin(admin.ModelAdmin):
     )
     list_filter = ("type", "active", "machine")
     search_fields = ("machine__name", "details")
+
+
+@admin.register(MonitorUser)
+class MonitorUserAdmin(admin.ModelAdmin):
+    list_display = ("username", "created_at")
+    search_fields = ("username",)
