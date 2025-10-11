@@ -18,6 +18,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from .views_api import incidents_list, incidents_stream
+from .views_ui import incidents_page, login_submit, logout_view
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("ui/login", login_submit, name="ui_login"),
+    path("ui/logout", logout_view, name="ui_logout"),
+    path("ui/incidents", incidents_page, name="ui_incidents"),
+    path("api/incidents", incidents_list, name="api_incidents"),
+    path("api/incidents/stream", incidents_stream, name="api_incidents_stream"),
 ]
