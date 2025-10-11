@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.hashers import make_password, check_password
 
 
 # удаленная машина
@@ -72,3 +73,24 @@ class Incident(models.Model):
         incident_type = Incident.Type(self.type).label
         status = "ACTIVE" if self.active else "SOLVED"
         return f"Incident {incident_type} is {status}"
+
+
+class MonitorUser(models.Model):
+    username = models.CharField(max_length=50, unique=True)
+    password = models.CharField(max_length=200)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["username"]
+
+    def __str__(self) -> str:
+        return self.username
+
+    @classmethod
+    def create_user(cls, username, raw_password):
+        return cls.objects.create(
+            username=username, password_hash=make_password(raw_password)
+        )
+
+    def check_password(self, raw_password):
+        return check_password(raw_password, self.password)
