@@ -7,3 +7,14 @@ lint:
 
 format:
 	uv run ruff format
+docker:
+	docker compose up -d db redis
+	docker compose ps
+	docker compose logs -f db
+main:
+	uv run python main.py
+server:
+	uv run python manage.py runserver 0.0.0.0:8000
+celery:
+	uv run celery -A system_monitoring worker -l info
+
