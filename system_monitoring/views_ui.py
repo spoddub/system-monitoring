@@ -12,6 +12,9 @@ def login_page(request):
 
 @require_http_methods(["POST"])
 def login_submit(request):
+    if request.method == "GET":
+        return render(request, "login.html")
+
     username = (request.POST.get("username") or "").strip()
     password = request.POST.get("password") or ""
     user = MonitorUser.objects.filter(username=username).first()
