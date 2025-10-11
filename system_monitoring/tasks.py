@@ -24,6 +24,7 @@ def collect_metrics(machine_id):
         return "Machine not found"
 
     timeout = httpx.Timeout(
+        timeout=settings.REQUEST_READ_TIMEOUT,
         connect=settings.REQUEST_CONNECT_TIMEOUT,
         read=settings.REQUEST_READ_TIMEOUT,
         write=settings.REQUEST_READ_TIMEOUT,
