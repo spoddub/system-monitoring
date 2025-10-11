@@ -85,11 +85,21 @@ CELERY_BEAT_SCHEDULE = {
     "schedule-collecting-every-15m": {
         "task": "system_monitoring.tasks.schedule_collecting",
         "schedule": 15 * 60,
-    }
+    },
+    "evaluate-incidents-every-5m": {
+        "task": "system_monitoring.tasks.evaluate_all_machines",
+        "schedule": 5 * 60,
+    },
 }
+
 REQUEST_CONNECT_TIMEOUT = float(os.getenv("REQUEST_CONNECT_TIMEOUT", "3.0"))
 REQUEST_READ_TIMEOUT = float(os.getenv("REQUEST_READ_TIMEOUT", "8.0"))
 RETRY_LIMIT = int(os.getenv("RETRY_LIMIT", "3"))
+INCIDENT_CPU_THRESHOLD = int(os.getenv("INCIDENT_CPU_THRESHOLD", "85"))
+INCIDENT_MEM_THRESHOLD = int(os.getenv("INCIDENT_MEM_THRESHOLD", "90"))
+INCIDENT_MEM_LENGTH = int(os.getenv("INCIDENT_MEM_LENGTH", "2"))   # 30 мин
+INCIDENT_DISK_THRESHOLD = int(os.getenv("INCIDENT_DISK_THRESHOLD", "95"))
+INCIDENT_DISK_LENGTH = int(os.getenv("INCIDENT_DISK_LENGTH", "8"))  # 2 часа
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
