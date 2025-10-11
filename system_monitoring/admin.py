@@ -15,7 +15,7 @@ class MetricsSampleAdmin:
     list_display = (
         "machine",
         "collected_at",
-        "timeslot_star",
+        "timeslot_start",
         "cpu_pct",
         "mem_pct",
         "disk_pct",
