@@ -10,7 +10,7 @@ def login_page(request):
     return render(request, "login.html")
 
 
-@require_http_methods(["POST"])
+@require_http_methods(["GET", "POST"])
 def login_submit(request):
     if request.method == "GET":
         return render(request, "login.html")
