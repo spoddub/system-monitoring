@@ -35,7 +35,7 @@ class MetricsSample(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ["-colleted_at"]  # - сначала новые
+        ordering = ["-collected_at"]  # - сначала новые
 
     def __str__(self) -> str:
         return super().__str__()
