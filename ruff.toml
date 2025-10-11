@@ -2,6 +2,7 @@ line-length = 80
 
 extend-exclude = [
   "system_monitoring/settings.py",
+  "**/migrations/**",
 ]
 
 [lint]
