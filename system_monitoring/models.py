@@ -6,7 +6,7 @@ class Machine(models.Model):
     name = models.CharField(max_length=150, unique=True)
     url = models.URLField()
     # вкл выкл машины
-    is_ative = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
     # задержка в сек
     jitter_sec = models.PositiveBigIntegerField(default=120)
 
