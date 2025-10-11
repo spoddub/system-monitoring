@@ -89,7 +89,7 @@ class MonitorUser(models.Model):
     @classmethod
     def create_user(cls, username, raw_password):
         return cls.objects.create(
-            username=username, password_hash=make_password(raw_password)
+            username=username, password=make_password(raw_password)
         )
 
     def check_password(self, raw_password):
