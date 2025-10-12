@@ -92,6 +92,12 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": 5 * 60,
     },
 }
+CELERY_BEAT_SCHEDULE.update({
+    "evaluate-incidents-every-1m": {
+        "task": "system_monitoring.tasks.evaluate_incidents",
+        "schedule": 60,
+    },
+})
 
 REQUEST_CONNECT_TIMEOUT = float(os.getenv("REQUEST_CONNECT_TIMEOUT", "3.0"))
 REQUEST_READ_TIMEOUT = float(os.getenv("REQUEST_READ_TIMEOUT", "8.0"))
