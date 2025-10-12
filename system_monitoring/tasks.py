@@ -4,6 +4,7 @@ from datetime import timedelta
 import httpx
 from celery import shared_task
 from django.conf import settings
+from django.db import transaction
 from django.utils import timezone
 
 from .metrics_parsers import parse_percent, parse_uptime
@@ -136,73 +137,68 @@ def get_recent_metrics_window(machine, minutes):
 
 
 @shared_task
-def evaluate_incidents(machine_id: int):
-    machine = Machine.objects.filter(pk=machine_id, is_active=True).first()
-    if not machine:
-        return "Machine not found"
+def evaluate_incidents():
+    now = timezone.now()
+    slot = floor_to_15mins(now)
 
-    last_cpu = (
-        MetricsSample.objects.filter(machine=machine)
-        .only("timeslot_start", "cpu_pct")
-        .order_by("-timeslot_start")
-        .first()
-    )
-    if (
-        last_cpu
-        and last_cpu.cpu_pct is not None
-        and last_cpu.cpu_pct > settings.INCIDENT_CPU_THRESHOLD
-    ):
-        open_or_update(
-            machine=machine,
-            incident_type=Incident.Type.CPU,
-            first_timeslot=last_cpu.timeslot_start,
-            last_timeslot=last_cpu.timeslot_start,
-            message=(
-                f"cpu={last_cpu.cpu_pct}%, "
-                f"thr>{settings.INCIDENT_CPU_THRESHOLD}"
-            ),
-        )
-    else:
-        close_if_active(machine, Incident.Type.CPU)
+    created = 0
+    updated = 0
+    resolved = 0
 
-    mem_metrics, mem_last = get_recent_metrics_window(machine, 30)
-    if (
-        mem_last
-        and len(mem_metrics) >= 2
-        and all(
-            s.mem_pct is not None
-            and s.mem_pct > settings.INCIDENT_MEM_THRESHOLD
-            for s in mem_metrics
+    for m in Machine.objects.filter(is_active=True).only("id"):
+        smp = (
+            MetricsSample.objects.filter(machine=m, timeslot_start=slot)
+            .order_by("-collected_at")
+            .first()
         )
-    ):
-        open_or_update(
-            machine=machine,
-            incident_type=Incident.Type.MEM,
-            first_timeslot=mem_metrics[0].timeslot_start,
-            last_timeslot=mem_metrics[-1].timeslot_start,
-            message=f"mem>{settings.INCIDENT_MEM_THRESHOLD}% for 30m",
-        )
-    else:
-        close_if_active(machine, Incident.Type.MEM)
+        if not smp:
+            continue
 
-    disk_metrics, disk_last = get_recent_metrics_window(machine, 120)
-    if (
-        disk_last
-        and len(disk_metrics) >= 8
-        and all(
-            s.disk_pct is not None
-            and s.disk_pct > settings.INCIDENT_DISK_THRESHOLD
-            for s in disk_metrics
-        )
-    ):
-        open_or_update(
-            machine=machine,
-            incident_type=Incident.Type.DISK,
-            first_timeslot=disk_metrics[0].timeslot_start,
-            last_timeslot=disk_metrics[-1].timeslot_start,
-            message=f"disk>{settings.INCIDENT_DISK_THRESHOLD}% for 2h",
-        )
-    else:
-        close_if_active(machine, Incident.Type.DISK)
+        cpu_bad = smp.cpu_pct is not None and smp.cpu_pct > 85
 
-    return "evaluated"
+        with transaction.atomic():
+            active_cpu = (
+                Incident.objects.select_for_update()
+                .filter(machine=m, type=Incident.Type.CPU, active=True)
+                .first()
+            )
+
+            if cpu_bad:
+                if active_cpu:
+                    changed = False
+                    if active_cpu.last_timeslot != slot:
+                        active_cpu.last_timeslot = slot
+                        changed = True
+                    details = f"cpu={smp.cpu_pct}% @ {slot.isoformat()}"
+                    if active_cpu.details != details:
+                        active_cpu.details = details
+                        changed = True
+                    if changed:
+                        active_cpu.save(
+                            update_fields=["last_timeslot", "details"]
+                        )
+                        updated += 1
+                else:
+                    Incident.objects.create(
+                        machine=m,
+                        type=Incident.Type.CPU,
+                        active=True,
+                        started_at=smp.collected_at,
+                        resolved_at=None,
+                        first_timeslot=slot,
+                        last_timeslot=slot,
+                        details=f"cpu={smp.cpu_pct}% @ {slot.isoformat()}",
+                    )
+                    created += 1
+            else:
+                if active_cpu:
+                    active_cpu.active = False
+                    active_cpu.resolved_at = smp.collected_at
+                    if active_cpu.details is None:
+                        active_cpu.details = ""
+                    active_cpu.save(
+                        update_fields=["active", "resolved_at", "details"]
+                    )
+                    resolved += 1
+
+    return f"cpu created={created}, updated={updated}, resolved={resolved}"
