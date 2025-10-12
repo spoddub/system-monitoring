@@ -1,25 +1,33 @@
 import json
 import random
-import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.parse import parse_qs, urlsplit
+
+
+def as_int(qs, name, default):
+    try:
+        if name in qs:
+            return int(qs[name][0])
+    except Exception:
+        pass
+    return default
 
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        time.sleep(random.uniform(0.05, 0.3))
-        if random.random() < 0.03:
-            self.send_response(500)
-            self.end_headers()
-            self.wfile.write(b"internal error")
-            return
+        qs = parse_qs(urlsplit(self.path).query)
+
+        cpu = as_int(qs, "cpu", random.randint(10, 80))
+        mem = as_int(qs, "mem", random.randint(10, 70))
+        disk = as_int(qs, "disk", random.randint(10, 70))
 
         payload = {
-            "cpu": random.randint(0, 100),
-            "mem": f"{random.randint(0, 100)}%",
-            "disk": f"{random.randint(0, 100)}%",
+            "cpu": cpu,
+            "mem": f"{mem}%",
+            "disk": f"{disk}%",
             "uptime": "1d 2h 37m 6s",
         }
-        body = json.dumps(payload).encode("utf-8")
+        body = (json.dumps(payload) + "\n").encode("utf-8")
 
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
@@ -28,11 +36,7 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
 
-def run():
-    server = HTTPServer(("127.0.0.1", 9001), Handler)
-    print("Mock listening on http://127.0.0.1:9001/")
-    server.serve_forever()
-
-
 if __name__ == "__main__":
-    run()
+    host, port = "127.0.0.1", 9001
+    print(f"Mock listening on http://{host}:{port}/")
+    HTTPServer((host, port), Handler).serve_forever()
