@@ -1,3 +1,5 @@
+[![CI](https://github.com/spoddub/system-monitoring/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/spoddub/system-monitoring/actions/workflows/ci.yml)
+
 # System Monitoring
 
 Сбор метрик с удалённых машин, хранение в БД, детекция инцидентов, UI + SSE-обновления.
