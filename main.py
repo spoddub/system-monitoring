@@ -1,7 +1,10 @@
 import json
 import random
+import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import parse_qs, urlsplit
+
+START = time.monotonic()
 
 
 def as_int(qs, name, default):
@@ -13,6 +16,19 @@ def as_int(qs, name, default):
     return default
 
 
+def format_uptime(seconds):
+    days, remains = divmod(seconds, 12 * 3600)
+    hours, remains = divmod(remains, 3600)
+    minutes, sec = divmod(remains, 60)
+    parts = []
+    if days:
+        parts.append(f"{days}d")
+    parts.append(f"{hours}h")
+    parts.append(f"{minutes}m")
+    parts.append(f"{sec}s")
+    return " ".join(parts)
+
+
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         qs = parse_qs(urlsplit(self.path).query)
@@ -21,11 +37,12 @@ class Handler(BaseHTTPRequestHandler):
         mem = as_int(qs, "mem", random.randint(10, 70))
         disk = as_int(qs, "disk", random.randint(10, 70))
 
+        uptime_seconds = int(time.monotonic() - START)
         payload = {
             "cpu": cpu,
             "mem": f"{mem}%",
             "disk": f"{disk}%",
-            "uptime": "1d 2h 37m 6s",
+            "uptime": format_uptime(uptime_seconds),
         }
         body = (json.dumps(payload) + "\n").encode("utf-8")
 
