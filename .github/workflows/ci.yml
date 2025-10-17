@@ -7,10 +7,33 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root_pass
+          MYSQL_DATABASE: system_monitoring
+          MYSQL_USER: app
+          MYSQL_PASSWORD: app_pass
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot_pass"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=30
+
     env:
       DJANGO_DEBUG: "0"
       DJANGO_SETTINGS_MODULE: system_monitoring.settings
       SECRET_KEY: "ci-secret"
+      MYSQL_HOST: "127.0.0.1"
+      MYSQL_PORT: "3306"
+      MYSQL_DATABASE: "system_monitoring"
+      MYSQL_USER: "app"
+      MYSQL_PASSWORD: "app_pass"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,11 +43,19 @@ jobs:
         with:
           enable-cache: true
 
+      - name: Install system libs for mysqlclient
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libmysqlclient-dev
+
       - name: Install project dependencies
         run: uv sync --dev
 
       - name: Django checks
         run: uv run python manage.py check -v 2
+
+      - name: Run migrations
+        run: uv run python manage.py migrate --noinput
 
       - name: Ruff (lint + format check)
         run: |
