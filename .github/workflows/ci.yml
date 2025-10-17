@@ -28,6 +28,7 @@ jobs:
       DJANGO_DEBUG: "0"
       DJANGO_SETTINGS_MODULE: system_monitoring.settings
       SECRET_KEY: "ci-secret"
+      DJANGO_DB: "mysql"
       MYSQL_HOST: "127.0.0.1"
       MYSQL_PORT: "3306"
       MYSQL_DATABASE: "system_monitoring"
@@ -50,6 +51,15 @@ jobs:
 
       - name: Install project dependencies
         run: uv sync --dev
+
+      - name: Wait for MySQL
+        run: |
+          for i in {1..60}; do
+            if mysqladmin ping -h 127.0.0.1 -u root -proot_pass --silent; then
+              echo "MySQL is up"; break
+            fi
+            sleep 1
+          done
 
       - name: Django checks
         run: uv run python manage.py check -v 2
