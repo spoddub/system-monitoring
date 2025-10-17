@@ -6,3 +6,4 @@ celerybeat-schedule
 system_monitoring/tests/__pycache__
 celerybeat-schedule
 migrations/__pycache__
+db.sqlite3
