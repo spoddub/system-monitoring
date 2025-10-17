@@ -27,13 +27,12 @@ jobs:
     env:
       DJANGO_DEBUG: "0"
       DJANGO_SETTINGS_MODULE: system_monitoring.settings
-      SECRET_KEY: "ci-secret"
-      DJANGO_DB: "mysql"
-      MYSQL_HOST: "127.0.0.1"
-      MYSQL_PORT: "3306"
-      MYSQL_DATABASE: "system_monitoring"
-      MYSQL_USER: "app"
-      MYSQL_PASSWORD: "app_pass"
+      DJANGO_SECRET_KEY: "ci-secret"
+      DB_HOST: "127.0.0.1"
+      DB_PORT: "3306"
+      DB_NAME: "system_monitoring"
+      DB_USER: "app"
+      DB_PASSWORD: "app_pass"
 
     steps:
       - name: Checkout
